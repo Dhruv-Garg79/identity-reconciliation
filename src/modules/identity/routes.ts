@@ -5,6 +5,6 @@ import validation from './validation';
 
 const identifyRoutes = Router();
 
-identifyRoutes.get('/identify', validate(validation.identify), controller.identify);
+identifyRoutes.post('/identify', validate(validation.identify), controller.identify);
 
 export default identifyRoutes;

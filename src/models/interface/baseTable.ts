@@ -44,7 +44,7 @@ export default abstract class BaseTable<T> {
 
 	public async getByPk(id: number): Promise<Result<T>> {
 		try {
-			const res = await sql`select * from ${sql(this.tableName)} where ${sql(this.primaryKey)} = ${id}`;
+			const res = await sql`select * from ${sql(this.tableName)} where "${sql(this.primaryKey)}" = ${id}`;
 			return new Result(res[0] as any);
 		} catch (error) {
 			this.logger.error(error);
@@ -64,7 +64,9 @@ export default abstract class BaseTable<T> {
 
 	public async getCountByField(field: keyof T, value: ValueTypes): Promise<Result<number>> {
 		try {
-			const res = await sql`select count(*) as count from ${sql(this.tableName)} where ${sql(field as any)} = ${value}`;
+			const res = await sql`select count(*) as count from ${sql(this.tableName)} where "${sql(
+				field as any,
+			)}" = ${value}`;
 			return new Result(res[0].count as any);
 		} catch (error) {
 			this.logger.error(error);
@@ -74,27 +76,8 @@ export default abstract class BaseTable<T> {
 
 	public async getWhereFieldNot(field: keyof T, value: ValueTypes): Promise<Result<T[]>> {
 		try {
-			const res = await sql`select * from ${sql(this.tableName)} where ${sql(field as any)} != ${value}`;
+			const res = await sql`select * from ${sql(this.tableName)} where "${sql(field as any)}" != ${value}`;
 			return new Result(res as any);
-		} catch (error) {
-			this.logger.error(error);
-			return Result.error(error.message);
-		}
-	}
-
-	public async getByPaginated(param: PaginatedParams<T>): Promise<Result<T[]>> {
-		try {
-			if (param.order.order === 'asc') {
-				const res = await sql`select * from ${sql(this.tableName)} where ${sql(param.field as any)} = ${
-					param.value
-				} order by ${sql(param.order.by as any)} asc offset ${param.offset} limit ${param.limit}`;
-				return new Result(res as any);
-			} else {
-				const res = await sql`select * from ${sql(this.tableName)} where ${sql(param.field as any)} = ${
-					param.value
-				} order by ${sql(param.order.by as any)} desc offset ${param.offset} limit ${param.limit}`;
-				return new Result(res as any);
-			}
 		} catch (error) {
 			this.logger.error(error);
 			return Result.error(error.message);

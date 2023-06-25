@@ -8,7 +8,6 @@ const sql = postgres(`postgres://${username}:${password}@${host}:${port}/${db}`,
 	max_lifetime: 20 * 60,
 	idle_timeout: 5,
 	prepare: true,
-	ssl: { rejectUnauthorized: false },
 });
 
 export default sql;

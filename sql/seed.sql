@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS contacts ( 
   id serial PRIMARY KEY,
-  phoneNumber text,
-  email text,
-  linkedId integer,
-  linkPrecedence text,
-  createdAt timestamp WITH time zone DEFAULT NOW() NOT NULL,
-  updatedAt timestamp WITH time zone DEFAULT NOW() NOT NULL,
-  deletedAt timestamp WITH time zone
+  "phoneNumber" text,
+  "email" text,
+  "linkedId" integer,
+  "linkPrecedence" text,
+  "createdAt" timestamp WITH time zone DEFAULT NOW() NOT NULL,
+  "updatedAt" timestamp WITH time zone DEFAULT NOW() NOT NULL,
+  "deletedAt" timestamp WITH time zone
 );
 
 CREATE OR REPLACE FUNCTION update_timestamp_on_update()

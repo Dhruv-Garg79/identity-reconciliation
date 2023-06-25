@@ -1,11 +1,11 @@
+import compression from 'compression';
 import express, { Express } from 'express';
 import helmet from 'helmet';
-import compression from 'compression';
-import Result from '../utils/result';
-import { HttpStatus } from '../utils/httpStatus';
+import morgan from 'morgan';
 import identifyRoutes from '../modules/identity/routes';
 import { errorHandler } from '../utils/errors';
-import morgan from 'morgan';
+import { HttpStatus } from '../utils/httpStatus';
+import Result from '../utils/result';
 
 const app: Express = express();
 
@@ -25,9 +25,10 @@ app.use(morgan('dev'));
 
 app.use((_req, res, next) => {
 	res.sendSuccess = (data: object) => res.status(HttpStatus.SUCCESS).send(data);
-	res.sendClientError = (data: object, statusCode = HttpStatus.BAD_REQUEST) => res.status(statusCode).send(data);
-	res.sendServerError = (data: object, statusCode = HttpStatus.INTERNAL_SERVER_ERROR) =>
-		res.status(statusCode).send(data);
+	res.sendClientError = (message: string, data?: object, statusCode = HttpStatus.BAD_REQUEST) =>
+		res.status(statusCode).send({ message, data });
+	res.sendServerError = (message: string, data?: object, statusCode = HttpStatus.BAD_REQUEST) =>
+		res.status(statusCode).send({ message, data });
 
 	next();
 });
