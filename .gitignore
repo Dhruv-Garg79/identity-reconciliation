@@ -1,0 +1,25 @@
+# package directories
+node_modules
+jspm_packages
+package-lock.json
+
+# esbuild directories
+.esbuild
+
+#output js directory
+lib
+
+#webpack
+.webpack
+
+#yarn lock file
+yarn.lock
+yarn-error.log
+
+#env
+.env.prod
+
+#prod firebase
+.DS_Store
+
+.vscode

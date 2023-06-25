@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  postgres:
+    container_name: pg
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres-dev
+      - POSTGRES_USER=postgres_dev
+      - POSTGRES_DB=postgres
+    networks:
+      - backend
+  app:
+    container_name: bitespeed-identity
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    restart: always
+    env_file: .env.dev
+    ports:
+      - 3000:3000
+    links: 
+      - mongo  
+    depends_on:
+      - mongo  
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge    
+
+# docker run --name pg -p 5432:5432 -e POSTGRES_USER=postgres_dev -e POSTGRES_PASSWORD=postgres-dev -e POSTGRES_DB=postgres -d postgres
+# docker inspect pg -f "{{json .NetworkSettings.Networks }}"
+# nc -v 127.0.0.1 5432
