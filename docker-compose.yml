@@ -6,34 +6,41 @@ services:
     image: postgres
     restart: always
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       - POSTGRES_PASSWORD=postgres-dev
       - POSTGRES_USER=postgres_dev
       - POSTGRES_DB=postgres
     networks:
       - backend
+    volumes:
+      - db_data:/bitespeed/pg_data
+      - ./db/init.sh:/docker-entrypoint-initdb.d/init.sh
+      - ./db/seed.sql:/seed.sql
+
   app:
     container_name: bitespeed-identity
-    build: 
+    build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile_app
       target: base
     restart: always
     env_file: .env.dev
     ports:
       - 3000:3000
-    links: 
-      - mongo  
+    links:
+      - postgres
     depends_on:
-      - mongo  
+      - postgres
     networks:
       - backend
 
 networks:
   backend:
-    driver: bridge    
+    driver: bridge
 
+volumes:
+  db_data:
 # docker run --name pg -p 5432:5432 -e POSTGRES_USER=postgres_dev -e POSTGRES_PASSWORD=postgres-dev -e POSTGRES_DB=postgres -d postgres
 # docker inspect pg -f "{{json .NetworkSettings.Networks }}"
 # nc -v 127.0.0.1 5432

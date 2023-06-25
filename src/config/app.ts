@@ -34,7 +34,7 @@ app.use((_req, res, next) => {
 });
 
 // v1 api routes
-app.use('/v1', identifyRoutes);
+app.use('', identifyRoutes);
 
 // send back a 404 error for any unknown api request
 app.use((_req, _res, next) => {
