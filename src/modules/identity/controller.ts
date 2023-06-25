@@ -24,6 +24,14 @@ class Controller {
 			return existing.apiResponse(res);
 		}
 
+		const mergePrimaryContacts = await this.helper.mergePrimaryContacts(existing.value);
+		if (mergePrimaryContacts.isError()) {
+			this.logger.error('merging primary contacts failed', mergePrimaryContacts.error);
+			return mergePrimaryContacts.apiResponse(res);
+		}
+
+		existing.value = mergePrimaryContacts.value;
+
 		let emailExists = false;
 		let phoneExists = false;
 

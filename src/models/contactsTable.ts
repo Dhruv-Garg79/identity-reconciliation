@@ -50,4 +50,16 @@ export default class ContactsTable extends BaseTable<ContactType> {
 			return Result.error(error.message);
 		}
 	};
+
+	public updateLinkPrecedenceToSecondary = async (ids: number[], primaryId: number) => {
+		try {
+			const res = await sql`update ${sql(
+				this.tableName,
+			)} set "linkedId" = ${primaryId}, "linkPrecedence" = 'secondary' where id = ANY(${ids})`;
+			return new Result(res as any);
+		} catch (error) {
+			this.logger.error(error);
+			return Result.error(error.message);
+		}
+	};
 }

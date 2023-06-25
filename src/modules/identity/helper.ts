@@ -45,6 +45,43 @@ export class Helper {
 		return new Result(this.getUniqueContacts([contacts.value, otherContacts.value]));
 	};
 
+	public mergePrimaryContacts = async (contacts: ContactType[]): Promise<Result<ContactType[]>> => {
+		const primaryContacts = contacts.filter(contact => contact.linkPrecedence === LinkPreference.primary);
+		if (primaryContacts.length > 1) {
+			let oldestPrimary: ContactType = primaryContacts[0];
+			primaryContacts.forEach(contact => {
+				if (contact.createdAt.getTime() < oldestPrimary.createdAt.getTime()) oldestPrimary = contact;
+			});
+
+			// update these primary contacts to be secondary contacts
+			const oldPrimaryIds = new Set<number>();
+			primaryContacts.forEach(contact => {
+				if (contact.id !== oldestPrimary.id) oldPrimaryIds.add(contact.id);
+			});
+
+			this.logger.debug({ oldestPrimary, oldPrimaryIds });
+
+			const updatePrimary = await this.contactsTable.updateLinkPrecedenceToSecondary(
+				[...oldPrimaryIds],
+				oldestPrimary.id,
+			);
+
+			if (updatePrimary.isError()) {
+				this.logger.error('updating primary contacts to secondary failed', updatePrimary.error);
+				return updatePrimary;
+			}
+
+			contacts.forEach(contact => {
+				if (oldPrimaryIds.has(contact.id)) {
+					contact.linkPrecedence = LinkPreference.secondary;
+					contact.linkedId = oldestPrimary.id;
+				}
+			});
+		}
+
+		return new Result(contacts);
+	};
+
 	private getUniqueContacts = (arr: ContactType[][]) => {
 		const set = new Set();
 		const uniqueContacts = [];
