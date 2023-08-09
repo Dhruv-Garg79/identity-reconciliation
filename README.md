@@ -2,24 +2,16 @@
 
 ## Tech stack used
 
-- Node.js
+- Node.js v18.14.0
 - Typescript
 - Postgres
 - Docker
 
-## To run directly on OS
-
-Run these two commands from separate terminals
-
-```
-First run - `yarn compile:watch`
-then from second terminal - `yarn dev`
-```
-
-## To deploy using Docker
+## To run using docker
 
 ```
 chmod +x db/init.sh
+docker-compose build --no-cache
 docker-compose up
 ```
 
@@ -28,6 +20,7 @@ docker-compose up
 Endpoint: `/identify`
 
 Request Format:
+
 ```tsx
 {
 	"email"?: string,
@@ -36,6 +29,7 @@ Request Format:
 ```
 
 Response Format:
+
 ```tsx
 	{
 		"contact":{

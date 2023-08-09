@@ -1,13 +1,28 @@
-FROM node:16-alpine as base
-
+# First stage: compile the application
+FROM node:18.16.1-bullseye-slim as build
 WORKDIR /usr/src/app
 
-COPY package.json yarn.lock tsconfig.json .env.dev ./
+# This will become the secong layer, so we can cache the dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable
+RUN pnpm install
 
-COPY ./src ./src
+# After dependencies are cached as layer, we copy the rest of the files and compile the application
+COPY . .
+RUN ./node_modules/typescript/bin/tsc
 
+# Second stage: run the application with only the bare minimum dependencies, this will allow us to keep everything as small as possible and fast
+FROM node:18.16.1-bullseye-slim as base
+RUN apt update && apt install -y --no-install-recommends dumb-init 
+
+ENV NODE_ENV dev
+WORKDIR /usr/src/app
+
+COPY package.json pnpm-lock.yaml .env.dev ./
+RUN corepack enable
+RUN pnpm install --prod
+
+# Copy the compiled lib code from the first stage.
+COPY --from=build /usr/src/app/lib lib
 EXPOSE 3000
-
-RUN yarn install
-
-CMD ["yarn", "run", "build:dev"]
+CMD ["dumb-init", "node", "lib/index.js"]
